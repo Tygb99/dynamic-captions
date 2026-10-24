@@ -39,3 +39,9 @@ node scripts/make-captions.mjs ... --font "C:\fonts\MyFont.ttf"
 node scripts/make-captions.mjs ... --scale 0.85 --shade 0.3
 node scripts/render.mjs final job --style plain
 ```
+
+## Claude Code에 말로 시키기
+명령을 외우지 않아도 됩니다. Claude Code에 영상 주소(파일 위치)를 주고 이 스킬을 지정한 뒤 이렇게 말하면 됩니다.
+- "종이처럼 튀고 빠른 비트의 자막과 효과로 만들어 줘"
+- "폰트를 이걸로 해줘" + 글꼴 파일 위치 (또는 "명조체로 해줘", "손글씨 느낌으로 해줘")
+Claude Code가 위의 `--font` 옵션을 알아서 붙입니다. 어떤 글꼴이 들어갔는지는 시안 그림에서 확인하세요.

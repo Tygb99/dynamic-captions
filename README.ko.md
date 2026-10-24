@@ -208,7 +208,7 @@ node $S/render.mjs final job --style mix                   # 영상 전체
 <!-- credits -->
 ## 출처와 영감
 
-- [JIZURA](https://852wa.github.io/JIZURA/)(MIT)의 가사 타이포 방식의 문장별 스타일 변화를 영감으로 삼았습니다. 코드는 옮기지 않았고, 그 영상의 유료 상품은 구매하지도 보지도 않았습니다.
+- [JIZURA](https://852wa.github.io/JIZURA/)(MIT)의 가사 타이포 방식의 문장별 스타일 변화를 영감으로 삼았습니다. 코드는 옮기지 않았습니다.
 - 아이디어와 수치를 참고한 오픈소스 자막 도구 15곳, 사용한 라이브러리(Whisper, librosa, OpenCV, YuNet 얼굴 모델), 함께 넣은 글꼴 4종(SIL OFL)은 [references/sources.md](skills/dynamic-captions/references/sources.md)에 라이선스와 함께 있습니다.
 
 ## 만든 사람

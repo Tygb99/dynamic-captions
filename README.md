@@ -209,7 +209,7 @@ Details for developers: [SKILL.md](skills/dynamic-captions/SKILL.md) (the instru
 ## Credits and inspiration
 
 - Inspired by the lyric typography of [JIZURA](https://852wa.github.io/JIZURA/) (MIT).
-- No code was copied, and the paid product behind that video was not bought or looked at.
+- No code was copied.
 - 15 open-source caption tools whose ideas and numbers were consulted, the libraries used (Whisper, librosa, OpenCV, the YuNet face model) and 4 bundled fonts (SIL OFL) are listed with their licenses in [references/sources.md](skills/dynamic-captions/references/sources.md).
 
 ## Made by

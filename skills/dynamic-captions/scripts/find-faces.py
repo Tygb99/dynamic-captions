@@ -33,7 +33,11 @@ model = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets",
 if hasattr(cv2, "FaceDetectorYN") and os.path.exists(model):
     yn = cv2.FaceDetectorYN.create(model, "", (320, 320), 0.6, 0.3, 5000)
     engine = "yunet"
-casc = [cv2.CascadeClassifier(cv2.data.haarcascades + n) for n in ("haarcascade_frontalface_alt2.xml", "haarcascade_frontalface_default.xml")]
+casc = []
+if yn is None and hasattr(cv2, "CascadeClassifier"):  # fallback only when the YuNet model is unusable
+    casc = [cv2.CascadeClassifier(cv2.data.haarcascades + n) for n in ("haarcascade_frontalface_alt2.xml", "haarcascade_frontalface_default.xml")]
+if yn is None and not casc:
+    raise SystemExit("no face detector available: the YuNet model (assets/models) and OpenCV Haar cascades are both missing")
 
 def detect(frame):
     h, w = frame.shape[:2]

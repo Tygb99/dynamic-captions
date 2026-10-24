@@ -16,6 +16,7 @@ const desc = get('description');
 if (!desc || desc.length > 1024 || /<[a-z][^>]*>/i.test(desc)) problems.push('description missing, too long or has XML tags');
 if (md.split('\n').length > 500) problems.push('SKILL.md longer than 500 lines');
 if (/[A-Z]:\\|local:start/.test(md)) problems.push('SKILL.md still has a local path or a local block');
+for (const [a, b] of [['README.md', 'README.ko.md'], ['README.ko.md', 'README.md']]) { const x = path.join(root, a); if (!fs.existsSync(x)) problems.push('missing ' + a); else if (!fs.readFileSync(x, 'utf8').includes(b)) problems.push(a + ' must link to ' + b); }
 for (const f of ['Pretendard', 'BlackHanSans', 'IBMPlexSansKR', 'Gaegu']) if (!fs.existsSync(path.join(root, 'skills', name, 'assets', 'fonts', f + '-OFL.txt'))) problems.push('missing font license ' + f);
 if (!fs.existsSync(path.join(root, 'skills', name, 'assets', 'models', 'face_detection_yunet_2023mar.onnx'))) problems.push('missing YuNet model');
 for (const f of fs.readdirSync(path.join(root, 'skills', name, 'scripts'))) {

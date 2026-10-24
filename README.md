@@ -1,4 +1,6 @@
-<p align="center"><img src="docs/styles.png" alt="dynamic-captions: 19가지 자막 스타일을 같은 장면에서 비교한 시안" width="560"></p>
+<p align="right"><b>English</b> | <a href="README.ko.md">한국어</a></p>
+
+<p align="center"><img src="docs/styles.png" alt="dynamic-captions: the same scene captioned in 19 styles, side by side" width="560"></p>
 
 <p align="center">
 <a href="https://github.com/reedodev/dynamic-captions/actions/workflows/test.yml"><img src="https://github.com/reedodev/dynamic-captions/actions/workflows/test.yml/badge.svg" alt="test"></a>
@@ -6,104 +8,203 @@
 <img src="https://img.shields.io/badge/license-MIT-black" alt="MIT">
 </p>
 
-# 다이나믹 자막 (dynamic-captions)
+# dynamic-captions: automatic captions for your video
 
-영상(말하는 영상, 랩·노래 가사 영상, 쇼츠, 롱폼)을 주면 말과 가사를 단어 단위로 받아 적고, 같은 장면에 **19가지 자막 스타일과 문장마다 스타일을 바꾸는 자동 섞기** 시안을 먼저 보여 줍니다. 마음에 드는 스타일을 고르면 자막이 박힌 mp4와 투명 자막(.mov)을 만듭니다.
+**You give it a video. It writes the words on the screen, in a style you choose.**
 
-- **자막이 왼쪽·오른쪽·위·아래로 돌아가며 나옵니다.** 그래도 유튜브 자막(CC)이 뜨는 화면 아래와 쇼츠·릴스의 앱 버튼 자리는 비워 둡니다. 자기 자리를 벗어나면 렌더를 멈춥니다.
-- **얼굴을 피합니다.** 얼굴을 찾아 자막이 얼굴을 가리지 않는 자리를 고릅니다.
-- **글씨가 작아지지 않습니다.** 1080p에서 40px 아래로 줄어들면 더 넓은 자리로 옮깁니다.
-- **노래에 맞춥니다.** 박마다 자막이 살짝 커지고, 반복되는 후렴은 크게 나옵니다.
-- **가사 철자를 맞춥니다.** 받아쓰기가 틀려도 가사 대본의 글자와 소리의 시간을 합칩니다. 가사와 소리가 다른 곳은 사람이 들어 확인할 클립으로 뽑아 줍니다.
-- **빠릅니다.** 여러 Chrome이 프레임을 나눠 그려서 75초 1080p 영상이 약 3배 빨라졌습니다.
+That is the whole idea. You do not draw anything or edit a timeline. The tool listens to your video, writes down every spoken word with its time, and shows you the same scene in 19 caption styles. You pick the one you like, and it gives you a new video with the captions burned in.
 
-## 무엇이 필요한가요?
+It is a "skill" for Claude Code (an AI assistant from Anthropic that runs on your computer). You can use it by chatting with the assistant, or run the commands yourself. Both ways are explained below.
 
-| 준비물 | 어디에 쓰나요 | 꼭 필요한가요 |
-|---|---|---|
-| Node.js 18 이상 | 모든 스크립트 | 필수 |
-| ffmpeg와 ffprobe (PATH) | 영상 읽기, 자막 합성 | 필수 |
-| Chrome 또는 Chromium (못 찾으면 `CHROME=<경로>`) | 자막을 그리는 화면 | 필수 |
-| Python 3.10+ 와 `pip install openai-whisper numpy` | 받아쓰기 | 필수(단어 시간표가 따로 있으면 생략) |
-| `pip install librosa` | 노래 박자 | 선택 |
-| `pip install opencv-python-headless` | 얼굴 찾기 | 선택 |
-| 대본이나 가사 텍스트 | 철자 맞추기 | 권장 |
-| NVIDIA 그래픽카드 | 빠른 인코딩 | 선택 |
+## Is this for me?
 
-자세한 표는 [SKILL.md의 준비물](skills/dynamic-captions/SKILL.md#준비물-쓰기-전에-있어야-하는-것)에 있습니다.
+Yes, if you:
+- make Shorts, Reels, TikToks or longer videos and want captions that look good without learning video editing,
+- make music videos or lyric videos and want the lyrics to appear on time,
+- want captions that stay out of the way: they do not hide faces, and they do not sit where YouTube shows its own subtitles.
 
-## 바꿔 쓰기
+## What makes it different
 
-에이전트에게 다음처럼 말하면 옵션을 바꿔서 실행합니다.
+- **19 looks + "mix".** Mix changes the look sentence by sentence, so the video does not feel repetitive.
+- **Captions move around** (left, right, top, bottom), but never into the zones where apps put their own buttons or subtitles.
+- **Faces are avoided.** It finds faces and puts captions somewhere else.
+- **Text is never tiny.** If a caption would get too small, it moves to a wider spot.
+- **Songs:** captions pulse gently on the beat, and the chorus (lines that repeat) appears bigger.
+- **Lyrics are spelled right.** Speech recognition often mishears rap. If you have the real lyrics, the tool uses your spelling and the audio's timing. Where the two disagree, it cuts short clips so *you* can listen to just those spots.
+- **Fast.** Several Chrome windows draw frames at the same time (a 75-second Full HD clip: 197 s → 64 s).
 
-- "자막을 더 크게" → `--scale 1.4`
-- "자막이 한쪽에만 나오게" → `--pos fixed` 또는 `--pos bottom-left`
-- "배경이 밝아서 안 보여" → `--shade 0.5`
-- "인물 얼굴을 가리지 마" → `find-faces.py` 후 `--faces faces.json`
-- "노래 박자에 맞춰" → `detect-beat.py` 후 `--beat beat.json`
-- "빨리 만들어줘" → `--workers 4 --encoder auto`
+## Before you start: what to install
 
-전체 표는 [SKILL.md의 바꿔 쓰기](skills/dynamic-captions/SKILL.md#바꿔-쓰기-이렇게-말하세요)에 있습니다.
+You need four free programs. If you already have them, skip ahead. Open a terminal (Windows: PowerShell; Mac: Terminal) and type the check command to see if each one is installed.
 
-## 설치
+| Program | What it is for | Check it | How to get it |
+|---|---|---|---|
+| **Node.js** 18 or newer | runs the tool's scripts | `node -v` | https://nodejs.org (the "LTS" button) |
+| **ffmpeg** | reads and writes video | `ffmpeg -version` | Windows: `winget install Gyan.FFmpeg` · Mac: `brew install ffmpeg` |
+| **Google Chrome** (or Chromium) | draws the captions | just open Chrome once | https://www.google.com/chrome |
+| **Python** 3.10 or newer | listens to the audio (Whisper) | `python --version` (on Windows sometimes `py --version`) | https://www.python.org |
 
-**Claude Code 플러그인으로 설치**
+Then install the Python helpers (one time, takes a few minutes and a few GB because of Whisper):
+
+```bash
+pip install openai-whisper numpy
+pip install librosa                  # optional: beat detection for songs
+pip install opencv-python-headless   # optional: face finding
+```
+
+> **Tip:** if you use Claude Code, you can simply say *"install everything dynamic-captions needs"* and let the assistant do the steps above and tell you what is missing.
+
+An NVIDIA graphics card makes the final step faster, but it is not required.
+
+## Install the skill
+
+**Easiest: as a Claude Code plugin.** Type these two lines in Claude Code:
 
 ```
 /plugin marketplace add reedodev/dynamic-captions
 /plugin install dynamic-captions@dynamic-captions
 ```
 
-**폴더만 복사**
+**Or copy the folder yourself:**
 
 ```bash
 git clone https://github.com/reedodev/dynamic-captions.git
 cp -r dynamic-captions/skills/dynamic-captions ~/.claude/skills/
 ```
 
-## 바로 해 보기
+## Make your first captioned video
+
+### Way 1: just ask (recommended for beginners)
+
+Put your video in a folder and tell the assistant, for example:
+
+> "Add captions to `my-video.mp4` with dynamic-captions. Show me the styles first. The language is English."
+
+> "This is a rap song and here are the lyrics (`lyrics.txt`). Make lyric captions that avoid the face and follow the beat."
+
+The assistant will transcribe, show you a **style sheet** (one picture with all the looks), and wait for you to choose. Say something like *"number 7"* or *"the yellow one that highlights the key word"*. Then it renders the video and tells you where the file is.
+
+### Way 2: type the commands yourself
+
+Replace `my.mp4` with your video. Run the commands from the folder where you cloned this project. The first line below is for Mac/Linux; in Windows PowerShell write it as `$S = "skills/dynamic-captions/scripts"` and leave the other lines as they are.
+
+**Step 1: write down the words** (the first run downloads about 1.5 GB of speech model, so it is slow once; on a computer without a GPU it can take a few minutes. Add `--model small` for a faster, less accurate try)
 
 ```bash
 S=skills/dynamic-captions/scripts
-python $S/transcribe.py my.mp4 --out words.json --lang ko            # 받아쓰기
-node $S/make-captions.mjs --video my.mp4 --words words.json --out job --scale 1.25 --shade 0.4
-node $S/render.mjs preview job                                       # 19개 스타일 시안: job/preview/overview.png
-node $S/render.mjs final job --style mix --range 0,20 --encoder auto # 20초 샘플
+python $S/transcribe.py my.mp4 --out words.json --lang en
 ```
 
-시안(`overview.png`)을 보고 스타일을 고른 뒤 `--style <id>`로 전체를 만듭니다. 에이전트가 [SKILL.md](skills/dynamic-captions/SKILL.md)를 읽고 이 순서(받아쓰기 → 철자 맞추기 → 직접 듣기 확인 → 시안 → 최종 렌더 → 검수)를 그대로 따릅니다.
+`--lang en` = English, `ko` = Korean, `ja` = Japanese, and so on. You get `words.json`: every word with its start and end time.
 
-## 시험
+**Step 2: prepare a work folder**
 
-`node tests/run.mjs`가 SKILL.md 형식을 검사하고, 합성 영상으로 자막 만들기·시안 19종·최종 렌더·병렬 렌더·철자 맞추기·직접 듣기 클립을 실제로 돌립니다. 푸시할 때마다 GitHub Actions가 같은 시험을 돌립니다(위 test 배지). 받아쓰기(Whisper) 자체는 시험에 넣지 않았습니다.
+```bash
+node $S/make-captions.mjs --video my.mp4 --words words.json --out job --scale 1.25 --shade 0.4
+```
 
-## 알려진 한계
+`--scale` makes text bigger or smaller. `--shade 0.4` puts a soft dark band behind the text so it stays readable on bright pictures.
 
-- AI는 소리를 직접 듣지 못합니다. 가사나 말과 소리가 맞는지는 사람이 `listen-check` 클립으로 확인해야 합니다.
-- 랩·노래의 단어 시간은 Whisper 기반이라 거칩니다(단어 하나를 최대 1.8초로 제한). 한국어 강제 정렬은 없습니다.
-- 얼굴은 사람 정면 얼굴만 찾습니다. 만화·동물·뒷모습은 놓칠 수 있고, 얼굴 말고 손·제품·몸은 피하지 않습니다.
-- 자막 스타일 취향과 시청 효과는 검증하지 않았습니다. 시안을 보고 직접 고르세요.
+**Step 3: look at the style sheet**
 
-구현 메모와 시험 수치는 [styles.md](skills/dynamic-captions/references/styles.md)에 있습니다.
+```bash
+node $S/render.mjs preview job
+```
+
+Open `job/preview/overview.png`. It shows your scene captioned in all 19 styles plus "mix". Choose one and note its name (for example `block-sweep` or `mix`).
+
+**Step 4: make a short sample, then the full video**
+
+```bash
+node $S/render.mjs final job --style mix --range 0,20      # only the first 20 seconds
+node $S/render.mjs final job --style mix                   # the whole video
+```
+
+Your video is in `job/out/` (named `captioned-mix.mp4`). Add `--alpha` if you also want a transparent caption file for your editing program. Add `--encoder auto` to use your graphics card, `--workers 1` if your computer gets slow.
+
+## The 19 styles in plain words
+
+| Name | What you see |
+|---|---|
+| `block-sweep` | a color block slides over each word as it is spoken |
+| `pop-word` | one or two big words pop in at a time |
+| `karaoke-fill` | words fill with color like karaoke |
+| `hero-key` | the most important word comes in big, the rest small |
+| `stack-kinetic` | words of different sizes fly in |
+| `underline-ink` | a calm line is drawn under the spoken word |
+| `glass-card` | text on a dark rounded card, the spoken word lights up |
+| `neon-glow` | words light up like neon, one by one |
+| `lead-big` | small lead-in words, then one big key word |
+| `chip-label` | numbers and names are marked with a yellow chip |
+| `stamp` | the key word is stamped in a red box |
+| `line-rise` | words slide up from a hidden line |
+| `hand-note` | handwriting look for casual videos |
+| `line-focus` | the line sits on a color panel; the spoken word is highlighted |
+| `fill-rise` | outlined letters fill up from the bottom |
+| `impact-wide` | one or two words blown up to fill the width |
+| `news-bar` | a news-style dark bar |
+| `typewriter` | letters appear one by one with a blinking cursor |
+| `wave` | the spoken word's letters bob like a wave |
+| `mix` | picks a different look for each sentence (a good first choice) |
+
+## Say it in plain words
+
+You do not have to remember options. Tell the assistant what you want:
+
+| You say | What changes |
+|---|---|
+| "bigger / smaller captions" | `--scale 1.4` / `--scale 0.9` |
+| "keep captions in one place" | `--pos fixed` or `--pos bottom-left` |
+| "the background is too bright to read" | `--shade 0.5` |
+| "don't cover the face" | `find-faces.py`, then `--faces faces.json` |
+| "follow the beat of the song" | `detect-beat.py`, then `--beat beat.json` |
+| "add emoji / an underline" | `--deco emoji,line` (off by default) |
+| "change the color" | `--palette mint` (gold, mint, sky, rose, lime) |
+| "make it faster" | `--workers 4 --encoder auto` |
+| "I also want a transparent caption file" | `--alpha` |
+| "I will choose the look for each sentence" | `--plan plan.json` |
+
+## Something went wrong?
+
+| What you see | What it means and what to do |
+|---|---|
+| `Chrome/Chromium not found` | Install Chrome, or tell the tool where it is: `CHROME="C:/path/to/chrome.exe"` (Mac/Linux: set the `CHROME` variable to the path) |
+| an error that mentions `ffmpeg` or `ENOENT` | ffmpeg is not installed, or its folder is not on your PATH. Install it and open a new terminal |
+| `자막이 안전 구역을 벗어났습니다` ("a caption left its safe area") | A long sentence does not fit its spot. Make it a little smaller (`--scale 1.0`) and run `make-captions` again |
+| Words are spelled wrong | Speech recognition made a mistake. Put the real text in a file and use `align-script.mjs`, or edit `words.json` |
+| Captions cover a face | Run `find-faces.py` first and add `--faces faces.json` (check `faces.preview.png`: green boxes show what it found) |
+| The computer freezes while rendering | Use `--workers 1` |
+
+## Words you may see
+
+- **Transcription:** writing down what is said, with the time of each word.
+- **Style sheet (preview):** one picture showing your scene in every style, so you can choose before the long render.
+- **Safe area:** places where apps already show something (YouTube subtitles at the bottom, buttons on the side in Shorts and Reels). Captions stay out of them.
+- **Render:** the final step that makes the new video file. It takes a few times the length of the video.
+- **Transparent caption file (`.mov`):** only the captions with a see-through background, to place on top of video in your editing program.
+
+## Honest limits
+
+- An AI cannot hear. If lyrics or speech match the sound is something **you** check, using the clips from `listen-check.mjs` (about one minute of listening).
+- Timing for rap and songs is rough, because it comes from Whisper (a word is capped at 1.8 s). There is no forced alignment yet.
+- Only front-facing human faces are found. Cartoons, animals and people seen from behind can be missed. Hands, products and bodies are not avoided.
+- Whether viewers like a style is not tested. Choose from the style sheet.
+
+## Tests
+
+`node tests/run.mjs` checks the skill file and runs everything on a made-up video: captions, the 19-style sheet, a final render, parallel render, spelling alignment, the listening clips, face finding and beat detection. GitHub Actions runs it on every change (see the badge on top). Whisper itself is not part of the test.
+
+Details for developers: [SKILL.md](skills/dynamic-captions/SKILL.md) (the instructions the assistant follows, written in Korean) and [styles.md](skills/dynamic-captions/references/styles.md) (how it works, measured numbers).
 
 <!-- credits -->
-## 출처와 영감
+## Credits and inspiration
 
-- [JIZURA](https://852wa.github.io/JIZURA/)(MIT)의 가사 타이포 방식과 [sequence_ai의 공개 영상](https://www.threads.com/@sequence_ai/post/De25KQAD6G7)에서 보인 문장별 스타일 변화를 영감으로 삼았습니다. 코드는 옮기지 않았고 유료 상품은 구매하지 않았습니다.
-- 규칙과 수치를 참고한 오픈소스 자막 도구 15곳, 사용한 라이브러리(Whisper, librosa, OpenCV, YuNet 얼굴 모델), 글꼴 4종(SIL OFL)은 [references/sources.md](skills/dynamic-captions/references/sources.md)에 라이선스와 함께 있습니다.
+- Inspired by the lyric typography of [JIZURA](https://852wa.github.io/JIZURA/) (MIT) and by the sentence-by-sentence style changes in a [public video by sequence_ai](https://www.threads.com/@sequence_ai/post/De25KQAD6G7). No code was copied, and the paid product behind that video was not bought or looked at.
+- 15 open-source caption tools whose ideas and numbers were consulted, the libraries used (Whisper, librosa, OpenCV, the YuNet face model) and 4 bundled fonts (SIL OFL) are listed with their licenses in [references/sources.md](skills/dynamic-captions/references/sources.md).
 
-## 만든 사람
+## Made by
 
-**리도**, AI 좌충우돌 실습 중인 20년차 엔지니어입니다. 매일 영상을 만들다가 막힌 부분을 고쳐 가며 이 스킬을 만들었습니다.
+**Reedo**, a 20-year engineer who keeps handing real work to AI and fixing what breaks. This skill came out of making videos every day.
 [YouTube @Reedodev](https://www.youtube.com/@Reedodev) · [Threads @reedo.dev](https://www.threads.com/@reedo.dev) · [GitHub @reedodev](https://github.com/reedodev)
 
----
-
-## English
-
-Give it a video (talking head, rap or song lyrics, Shorts, long form). It transcribes speech or lyrics word by word, shows **19 caption styles plus an auto-mix that changes style sentence by sentence** on the same scene, and after you pick one it renders a captioned mp4 and a transparent caption track (.mov).
-
-- Captions move between left, right, top and bottom, but always stay out of the YouTube-caption area and the app-button areas of Shorts/Reels. A caption that leaves its spot stops the render.
-- Face-aware (YuNet face model), minimum text size, beat pulse and automatic big chorus lines for songs, lyric spelling taken from your script while timing stays with the audio, a clip generator that lets a human listen to the places where lyrics and sound disagree, and parallel rendering (about 3x faster on a 75 s 1080p clip).
-
-Install: `/plugin marketplace add reedodev/dynamic-captions` then `/plugin install dynamic-captions@dynamic-captions`, or copy `skills/dynamic-captions` into `~/.claude/skills/`. Needs Node 18+, ffmpeg, Chrome/Chromium, Python 3.10+ with `openai-whisper` (optional: `librosa`, `opencv-python-headless`). See [SKILL.md](skills/dynamic-captions/SKILL.md) for the full procedure. The agent cannot hear: lyric/sound agreement must be checked by a person. MIT License; bundled fonts (SIL OFL) and the YuNet model keep their own licenses, see [sources.md](skills/dynamic-captions/references/sources.md).
+MIT License. The bundled fonts (SIL OFL 1.1) and the YuNet model (MIT) keep their own licenses.

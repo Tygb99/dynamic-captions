@@ -131,6 +131,27 @@ node $S/render.mjs final job --style mix                   # 영상 전체
 
 완성된 영상은 `job/out/`에 `captioned-mix.mp4`로 생깁니다. 편집 프로그램에 올릴 투명 자막 파일도 필요하면 `--alpha`, 그래픽카드를 쓰려면 `--encoder auto`, 컴퓨터가 느려지면 `--workers 1`을 붙이세요.
 
+## 글꼴
+`--font` 로 글꼴을 고릅니다. 무료 글꼴 5종(SIL OFL, 상업 영상에도 사용 가능)이 함께 들어 있습니다.
+
+| `--font` 값 | 글꼴 | 어울리는 곳 |
+|---|---|---|
+| `pretendard` | Pretendard ExtraBold | 깔끔한 고딕, 기본 |
+| `black-han` | Black Han Sans | 굵고 큰 제목, 짧은 핵심어 |
+| `plex` | IBM Plex Sans KR Bold | 차분한 고딕, 설명 영상 |
+| `gaegu` | Gaegu Bold | 손글씨 느낌 |
+| `myeongjo` | 나눔명조 ExtraBold | 명조, 시·감성 영상 |
+
+```bash
+node $S/make-captions.mjs ... --font myeongjo                 # 전체를 한 글꼴로
+node $S/make-captions.mjs ... --font plex --font-key black-han  # 큰 핵심어만 다른 글꼴
+node $S/make-captions.mjs ... --font "C:\fonts\MyFont.ttf"     # 내 글꼴 파일(.ttf .otf .woff2)
+```
+글꼴에 없는 글자는 Pretendard로 그려서 네모가 보이지 않습니다. 이 프로젝트에서 받은 글꼴이 아니라면 이용 조건을 직접 확인하세요. 자세한 설명은 [references/fonts.md](skills/dynamic-captions/references/fonts.md), 내 손글씨를 글꼴로 만드는 방법은 [references/handwriting-font.md](skills/dynamic-captions/references/handwriting-font.md) 에 있습니다.
+
+## 설명 영상용 차분한 자막
+`--style plain` 은 어두운 둥근 상자 안에 흰 글자 한 줄이 나옵니다. 색도 단어별 효과도 없어서 강의·튜토리얼에 맞습니다(자동 섞기에는 들어가지 않습니다).
+
 ## 스타일, 쉬운 말로
 
 | 이름 | 어떻게 보이나요 |

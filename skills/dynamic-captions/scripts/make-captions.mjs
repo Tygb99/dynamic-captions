@@ -11,6 +11,8 @@
 //        [--pos-plan plan.json]  [{"from":0,"to":6,"pos":"upper-left"}] fixed spot for those seconds
 //        [--beat beat.json] [--beat-strength 0.045]  songs: the caption swells on every beat (make beat.json with detect-beat.py; shifts with --shift)
 //        [--faces faces.json]  captions avoid faces (make faces.json with find-faces.py; shifts with --shift)
+//        [--font pretendard|black-han|plex|gaegu|myeongjo|<file.ttf/.otf/.woff2>]  one font for the whole job (default: each style keeps its own font). Glyphs a custom font lacks fall back to Pretendard automatically.
+//        [--font-key <same choices>]  font only for the big key words (hero-key, stamp, impact-wide ...); with --font-key alone the other text keeps its default font
 //        [--hook off]  turn off the chorus/hook detection (repeated lines become bigger, centred, punchier)
 //        [--shift seconds]   (clip cut later than the audio the timings come from: words move earlier by this much)
 //        [--plan plan.json]   (style=mix only) [{"from":0,"to":8,"style":"hero-key"}, ...] seconds -> fixed style for those phrases
@@ -70,18 +72,33 @@ const zone = opt.zone ? String(opt.zone).split(',').map(Number) : portrait ? [0.
 const palette = PALETTES[opt.palette || 'gold'] || PALETTES.gold;
 const out = path.resolve(opt.out); fs.mkdirSync(path.join(out, 'fonts'), { recursive: true });
 for (const f of fs.readdirSync(path.join(SKILL, 'assets/fonts'))) fs.copyFileSync(path.join(SKILL, 'assets/fonts', f), path.join(out, 'fonts', f));
+// ---- fonts: five bundled free fonts by name, or any font file of your own (it is copied into the job folder)
+const FONTS = { pretendard: 'Pretendard-ExtraBold.woff2', 'black-han': 'BlackHanSans-Regular.ttf', plex: 'IBMPlexSansKR-Bold.ttf', gaegu: 'Gaegu-Bold.ttf', myeongjo: 'NanumMyeongjo-ExtraBold.ttf' };
+const resolveFont = (spec, tag) => {
+  if (!spec || spec === true) return null; const s = String(spec);
+  if (FONTS[s.toLowerCase()]) return 'fonts/' + FONTS[s.toLowerCase()];
+  const p = path.resolve(s);
+  if (!fs.existsSync(p) || !/\.(ttf|otf|woff2?)$/i.test(p)) { console.error('font not found: ' + s + '\n  use one of: ' + Object.keys(FONTS).join(', ') + ' or the path of a .ttf/.otf/.woff/.woff2 file'); process.exit(2); }
+  const name = 'user-' + tag + path.extname(p).toLowerCase(); fs.copyFileSync(p, path.join(out, 'fonts', name)); return 'fonts/' + name;
+};
+const fontAll = resolveFont(opt.font, 'all'); const fontKey = resolveFont(opt['font-key'], 'key');
+const face = (fam, src, w) => '@font-face{font-family:' + fam + ';src:url(' + src + ');font-weight:' + w + '}';
+const faceCss = [
+  face('CapBase', 'fonts/Pretendard-ExtraBold.woff2', '100 900'), // glyph fallback: always available
+  face('CapMain', fontAll || 'fonts/Pretendard-ExtraBold.woff2', fontAll ? '100 900' : '800'),
+  face('CapDisplay', fontKey || fontAll || 'fonts/BlackHanSans-Regular.ttf', fontKey || fontAll ? '100 900' : '400'),
+  face('CapCalm', fontAll || 'fonts/IBMPlexSansKR-Bold.ttf', fontAll ? '100 900' : '700'),
+  face('CapHand', fontAll || 'fonts/Gaegu-Bold.ttf', fontAll ? '100 900' : '700'),
+].join('\n');
 fs.copyFileSync(path.join(HERE, 'runtime.js'), path.join(out, 'runtime.js'));
 const data = { width, height, fps, duration, words, palette, zone: { top: zone[0], bottom: zone[1] }, emphasis: opt.emphasis ? String(opt.emphasis).split(',').map((s) => s.trim()).filter(Boolean) : [], scale: +(opt.scale || 1), deco: opt.deco ? String(opt.deco).split(',').map((s) => s.trim()).filter(Boolean) : [], shade: +(opt.shade || 0), faces: opt.faces ? (JSON.parse(fs.readFileSync(opt.faces, 'utf8')).samples || []).map((s) => ({ t: +(s.t - (+opt.shift || 0)).toFixed(2), boxes: s.boxes })).filter((s) => s.t >= -0.5 && s.t <= duration + 0.5) : [], hook: opt.hook === 'off' ? 'off' : 'auto', beats: opt.beat ? (JSON.parse(fs.readFileSync(opt.beat, 'utf8')).beats || []).map((b) => b - (+opt.shift || 0)).filter((b) => b >= 0 && b <= duration) : [], beatStrength: +(opt['beat-strength'] || 0.045), pos: opt.pos || 'varied', posAvoid: opt['pos-avoid'] ? String(opt['pos-avoid']).split(',').map((s) => s.trim()).filter(Boolean) : [], posPlan: opt['pos-plan'] ? JSON.parse(fs.readFileSync(opt['pos-plan'], 'utf8')) : [], emojiMap: opt['emoji-map'] ? JSON.parse(fs.readFileSync(opt['emoji-map'], 'utf8')) : {}, plan: opt.plan ? JSON.parse(fs.readFileSync(opt.plan, 'utf8')) : [] };
 fs.writeFileSync(path.join(out, 'data.js'), 'window.CAPDATA=' + JSON.stringify(data) + ';');
 fs.writeFileSync(path.join(out, 'captions.html'), `<!doctype html><html><head><meta charset="utf-8"><style>
-@font-face{font-family:CapMain;src:url(fonts/Pretendard-ExtraBold.woff2);font-weight:800}
-@font-face{font-family:CapDisplay;src:url(fonts/BlackHanSans-Regular.ttf);font-weight:400}
-@font-face{font-family:CapCalm;src:url(fonts/IBMPlexSansKR-Bold.ttf);font-weight:700}
-@font-face{font-family:CapHand;src:url(fonts/Gaegu-Bold.ttf);font-weight:700}
+${faceCss}
 html,body{margin:0;background:transparent;width:${width}px;height:${height}px;overflow:hidden}
 #cap{position:absolute}
 </style></head><body><div id="shade"></div><div id="cap"></div><script src="data.js"></script><script src="runtime.js"></script></body></html>`);
 const vst = fs.statSync(path.resolve(opt.video));
-fs.writeFileSync(path.join(out, 'job.json'), JSON.stringify({ precision, videoStat: { size: vst.size, mtimeMs: vst.mtimeMs }, video: path.resolve(opt.video), width, height, fps, duration, zone, palette: opt.palette || 'gold', words: words.length, approxWords: approx }, null, 1));
+fs.writeFileSync(path.join(out, 'job.json'), JSON.stringify({ precision, videoStat: { size: vst.size, mtimeMs: vst.mtimeMs }, video: path.resolve(opt.video), width, height, fps, duration, zone, palette: opt.palette || 'gold', font: opt.font || null, fontKey: opt['font-key'] || null, words: words.length, approxWords: approx }, null, 1));
 console.log(`job: ${out}\n  timing precision: ${precision}${precision === 'cue-level' ? ' (line-level estimate: words inside a line are spread by characters; say so in the report)' : ''}\n  video ${width}x${height} @${fps}fps ${duration.toFixed(1)}s | words ${words.length}${approx ? ` (timing approximate for ${approx}: LRC/SRT line split)` : ''} | zone ${zone.join('~')} of height`);
 

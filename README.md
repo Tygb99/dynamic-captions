@@ -131,6 +131,27 @@ node $S/render.mjs final job --style mix                   # the whole video
 
 Your video is in `job/out/` (named `captioned-mix.mp4`). Add `--alpha` if you also want a transparent caption file for your editing program. Add `--encoder auto` to use your graphics card, `--workers 1` if your computer gets slow.
 
+## Fonts
+Pick a font with `--font`. Five free fonts (SIL OFL, fine for commercial videos) come with the skill:
+
+| `--font` | Font | Good for |
+|---|---|---|
+| `pretendard` | Pretendard ExtraBold | clean sans-serif, the everyday choice |
+| `black-han` | Black Han Sans | big heavy titles, short key words |
+| `plex` | IBM Plex Sans KR Bold | calm sans-serif, explainers |
+| `gaegu` | Gaegu Bold | handwriting feel |
+| `myeongjo` | Nanum Myeongjo ExtraBold | serif, poems and quiet videos |
+
+```bash
+node $S/make-captions.mjs ... --font myeongjo                 # one font for everything
+node $S/make-captions.mjs ... --font plex --font-key black-han  # big key words in another font
+node $S/make-captions.mjs ... --font "C:\fonts\MyFont.ttf"     # your own .ttf / .otf / .woff2
+```
+Letters your font does not have are drawn in Pretendard, so you never see empty boxes. Check the license of any font you did not get from this project: usage rules differ for every font. More in [references/fonts.md](skills/dynamic-captions/references/fonts.md). Turning your own handwriting into a font: [references/handwriting-font.md](skills/dynamic-captions/references/handwriting-font.md).
+
+## Calm captions for explainers
+`--style plain` shows one white line in a dark rounded box. No color, no word effects. Use it for lessons and tutorials (it is not part of "mix").
+
 ## The styles in plain words
 
 | Name | What you see |

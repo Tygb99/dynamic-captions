@@ -80,7 +80,7 @@
   });
   const css = document.createElement('style');
   css.textContent = `
-  #cap{font-family:CapMain,sans-serif;font-weight:800;font-size:${FS}px;line-height:1.18;color:#fff;font-synthesis:none}
+  #cap{font-family:CapMain,CapBase,sans-serif;font-weight:800;font-size:${FS}px;line-height:1.18;color:#fff;font-synthesis:none}
   #cap .ln{display:flex;flex-wrap:wrap;justify-content:var(--jc,center);align-items:baseline;column-gap:.3em;row-gap:.06em}
   #cap .w{display:inline-block;position:relative;white-space:nowrap;will-change:transform}
   #cap .col{display:flex;flex-direction:column;align-items:var(--ai,center);row-gap:.02em}
@@ -130,7 +130,7 @@
   S['pop-word'] = {
     label: '한 단어 팝', slack: 1.1, noFade: true, scale: 1.28, group: { maxChars: portrait ? 7 : 12, maxWords: 2 },
     build(ph, el, mix) {
-      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapDisplay,CapMain,sans-serif'; ln.style.fontWeight = 400;
+      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapDisplay,CapMain,CapBase,sans-serif'; ln.style.fontWeight = 400;
       ph.els = ph.words.map((w) => { const s = mk('span', 'w', ln, w.text); s.style.color = w === ph.key ? keyColor(ph, mix) : '#fff'; return s; });
     },
     update(ph, t) {
@@ -161,7 +161,7 @@
   S['hero-key'] = {
     label: '핵심어 히어로', slack: 1.25, group: { maxChars: portrait ? 12 : 22, maxWords: portrait ? 4 : 6 },
     build(ph, el, mix) {
-      buildRows(ph, el, '0.7em', (ks) => Object.assign(ks.style, { fontFamily: 'CapDisplay,CapMain,sans-serif', fontWeight: 400, fontSize: '2.1em', lineHeight: '1.0', color: keyColor(ph, mix), textShadow: OUT(0.05) + `,0 0 .3em ${keyColor(ph, mix)}55` }));
+      buildRows(ph, el, '0.7em', (ks) => Object.assign(ks.style, { fontFamily: 'CapDisplay,CapMain,CapBase,sans-serif', fontWeight: 400, fontSize: '2.1em', lineHeight: '1.0', color: keyColor(ph, mix), textShadow: OUT(0.05) + `,0 0 .3em ${keyColor(ph, mix)}55` }));
     },
     update(ph, t) {
       ph.words.forEach((w) => {
@@ -179,7 +179,7 @@
       ph.els = ph.words.map((w, k) => {
         const n = strip(w.text).length, key = w === ph.key; const s = mk('span', 'w', ln, w.text);
         s.style.fontSize = (key ? 1.55 : n <= 2 ? 0.72 : 1) + 'em'; s.style.color = key ? keyColor(ph, mix) : '#fff';
-        if (key) { s.style.fontFamily = 'CapDisplay,CapMain,sans-serif'; s.style.fontWeight = 400; }
+        if (key) { s.style.fontFamily = 'CapDisplay,CapMain,CapBase,sans-serif'; s.style.fontWeight = 400; }
         s.style.textShadow = OUT(0.065); s.dir = [-1, 0, 1, 0][k % 4]; s.dirY = [0, 1, 0, -1][k % 4]; return s;
       });
     },
@@ -195,7 +195,7 @@
   S['underline-ink'] = {
     label: '밑줄 짚기', group: { maxChars: portrait ? 12 : 26, maxWords: portrait ? 4 : 8 },
     build(ph, el) {
-      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapCalm,CapMain,sans-serif'; ln.style.fontWeight = 700;
+      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapCalm,CapMain,CapBase,sans-serif'; ln.style.fontWeight = 700;
       ph.els = ph.words.map((w) => {
         const s = mk('span', 'w', ln, w.text); s.style.textShadow = OUT(0.06);
         const u = mk('i', 'u', s); Object.assign(u.style, { position: 'absolute', left: 0, right: 0, bottom: '-.04em', height: '.11em', background: w === ph.key ? PAL.accent2 : PAL.accent, borderRadius: '.06em', transformOrigin: 'left', transform: 'scaleX(0)' });
@@ -306,7 +306,7 @@
   S['hand-note'] = {
     label: '손글씨 메모', group: { maxChars: portrait ? 11 : 22, maxWords: portrait ? 4 : 6 },
     build(ph, el) {
-      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapHand,CapMain,sans-serif'; ln.style.fontWeight = 700; ln.style.fontSize = '1.2em';
+      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapHand,CapMain,CapBase,sans-serif'; ln.style.fontWeight = 700; ln.style.fontSize = '1.2em';
       ph.els = ph.words.map((w, k) => {
         const s = mk('span', 'w', ln, w.text); s.style.textShadow = OUT(0.07); s.rot = [-2, 1.5, -1, 2.5][k % 4];
         if (w === ph.key) { s.style.color = PAL.accent; const u = mk('i', 'u', s); Object.assign(u.style, { position: 'absolute', left: '-2%', right: '-2%', bottom: '-.02em', height: '.1em', background: PAL.accent, borderRadius: '.1em', transformOrigin: 'left', transform: 'scaleX(0) rotate(-1.5deg)' }); s.u = u; }
@@ -343,7 +343,7 @@
   S['fill-rise'] = {
     label: '윤곽 채움', slack: 1.1, group: { maxChars: portrait ? 8 : 16, maxWords: portrait ? 3 : 5 },
     build(ph, el, mix) {
-      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapDisplay,CapMain,sans-serif'; ln.style.fontWeight = 400; ln.style.fontSize = '1.25em';
+      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapDisplay,CapMain,CapBase,sans-serif'; ln.style.fontWeight = 400; ln.style.fontSize = '1.25em';
       ph.els = ph.words.map((w) => {
         const s = mk('span', 'w', ln, w.text); Object.assign(s.style, { color: 'transparent', webkitTextStroke: '.04em #fff', filter: 'drop-shadow(0 .04em .07em rgba(0,0,0,.75))' });
         const f = mk('span', 'f', s, w.text); Object.assign(f.style, { position: 'absolute', left: 0, top: 0, color: w === ph.key ? PAL.accent2 : PAL.accent, webkitTextStroke: '0', clipPath: 'inset(100% 0 0 0)' }); s.f = f; return s;
@@ -356,7 +356,7 @@
   S['impact-wide'] = {
     label: '꽉 찬 큰 글씨', fill: 2.4, slack: 1.1, group: { maxChars: portrait ? 6 : 10, maxWords: 2 },
     build(ph, el, mix) {
-      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapDisplay,CapMain,sans-serif'; ln.style.fontWeight = 400; ln.style.lineHeight = '1.0';
+      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapDisplay,CapMain,CapBase,sans-serif'; ln.style.fontWeight = 400; ln.style.lineHeight = '1.0';
       ph.els = ph.words.map((w) => { const s = mk('span', 'w', ln, w.text); s.style.color = w === ph.key ? keyColor(ph, mix) : '#fff'; s.style.textShadow = OUT(0.045); return s; });
     },
     update(ph, t) { ph.words.forEach((w, k) => { const s = ph.els[k], p = easeBack((t - w.start) / 0.18), vis = t >= w.start - 0.01; s.style.opacity = vis ? 1 : 0; s.style.transform = `scale(${vis ? 0.7 + 0.3 * p : 0.7})`; }); },
@@ -377,7 +377,7 @@
   S['typewriter'] = {
     label: '타자기', group: { maxChars: portrait ? 10 : 20, maxWords: portrait ? 3 : 6 },
     build(ph, el) {
-      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapCalm,CapMain,sans-serif'; ph.chars = [];
+      const ln = mk('div', 'ln', el); ln.style.fontFamily = 'CapCalm,CapMain,CapBase,sans-serif'; ph.chars = [];
       ph.els = ph.words.map((w) => { const s = mk('span', 'w', ln, ''); s.style.textShadow = OUT(0.06); if (w === ph.key) s.style.color = PAL.accent; ph.chars.push([...w.text].map((c) => { const i = mk('span', 'c', s, c); i.style.display = 'inline-block'; return i; })); return s; });
       const caret = mk('i', 'caret', ln); Object.assign(caret.style, { display: 'inline-block', width: '.08em', height: '.9em', background: PAL.accent, marginLeft: '.05em', alignSelf: 'center' }); ph.caret = caret;
     },
@@ -392,6 +392,16 @@
       ph.els = ph.words.map((w) => { const s = mk('span', 'w', ln, ''); s.style.textShadow = OUT(0.065); ph.chars.push([...w.text].map((c) => { const i = mk('span', 'c', s, c); i.style.display = 'inline-block'; return i; })); return s; });
     },
     update(ph, t) { ph.words.forEach((w, k) => { const on = t >= w.start && t < w.end + 0.1; ph.chars[k].forEach((c, i) => { c.style.transform = on ? `translateY(${(-Math.sin((t - w.start) * 14 - i * 0.7) * 0.12).toFixed(3)}em)` : 'translateY(0)'; c.style.color = on ? (w === ph.key ? PAL.accent2 : PAL.accent) : '#fff'; }); ph.els[k].style.opacity = t < w.start ? 0.7 : 1; }); },
+  };
+
+  // 20. plain : calm explainer caption. White text in a dark rounded box, the whole line fades in at once. No colour, no word effects. Not part of mix.
+  S['plain'] = {
+    label: '차분한 자막(설명 영상용)', group: { maxChars: portrait ? 14 : 28, maxWords: portrait ? 4 : 9 },
+    build(ph, el) {
+      const card = mk('div', 'card', el); Object.assign(card.style, { background: 'rgba(8,12,24,.74)', borderRadius: '.3em', padding: '.2em .55em .26em', fontSize: '.86em', boxShadow: '0 .12em .5em rgba(0,0,0,.35)' });
+      const ln = mk('div', 'ln', card); ph.card = card; ph.els = ph.words.map((w) => mk('span', 'w', ln, w.text));
+    },
+    update(ph, t) { ph.card.style.opacity = easeOut((t - ph.vs) / 0.18); },
   };
 
   // ---------- mix: one style per phrase ----------
@@ -560,7 +570,7 @@
     els.forEach((e) => { const r = e.getBoundingClientRect(); if (r.width === 0 || getComputedStyle(e).opacity === '0') return; x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom); });
     return x0 > 1e8 ? null : { x0, y0, x1, y1, W, H };
   };
-  Promise.all(['800 40px CapMain', '400 40px CapDisplay', '700 40px CapCalm', '700 40px CapHand'].map((f) => document.fonts.load(f, '가나다ABC'))).then(() => { window.ready = true; });
+  Promise.all(['800 40px CapBase', '800 40px CapMain', '400 40px CapDisplay', '700 40px CapCalm', '700 40px CapHand'].map((f) => document.fonts.load(f, '가나다ABC'))).then(() => { window.ready = true; });
 })();
 
 

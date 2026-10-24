@@ -96,11 +96,20 @@ JIZURA(노래 가사 타이포)와 GitHub 오픈소스 자막 스킬들의 아�
 - **후렴 자동 판별**: 같은 글자 줄이 2번 이상 나오는 구간(6자 이상)은 후렴으로 보고 글자를 12% 키우고 가운데에 두며 hero-key·impact-wide·stack-kinetic·stamp 중에서 고른다. 후렴이 줄 나눔이 달라도 전체 글에서 찾아서 잡는다.
 - 노래·랩 절차: ①음원에서 `transcribe.py` ②가사 줄(태그 줄 제외)을 `script.txt`로 저장해 `align-script.mjs` ③`listen-check.mjs`로 사용자 청취 확인 ④그림 한 장짜리면 ffmpeg zoompan으로 천천히 확대한 배경 영상을 만들어 `make-captions`에 넣는다 ⑤`detect-beat.py` ⑥(사람이 나오면) `find-faces.py`. JIZURA 특유의 큰 가사 타이포·투명 PNG ZIP이 필요하면 [JIZURA](https://852wa.github.io/JIZURA/)(MIT)를 따로 쓴다.
 
+## 글꼴 (`--font`, `--font-key`)
+- 무료 5종: `pretendard`, `black-han`, `plex`, `gaegu`, `myeongjo` (OFL, 상업 이용 가능). 예: `--font myeongjo`, 큰 핵심어만 `--font-key black-han`, 내 파일은 `--font ./My.ttf`.
+- 내 글꼴에 없는 글자는 Pretendard로 자동 대체된다(네모 방지). 굵기는 파일이 정하고 억지로 굵게 만들지 않는다.
+- 사용자가 글꼴을 말하지 않으면 지정하지 않는다(스타일마다 기본 글꼴). 남이 만든 글꼴의 영상·상업 이용 조건은 이 스킬이 검사하지 않으니 사용자에게 확인하라고 알린다.
+- 자세한 설명: `references/fonts.md`. 손글씨를 글꼴로 만드는 방법: `references/handwriting-font.md`.
+
+## 설명 영상용 차분한 자막 (`--style plain`)
+- 어두운 둥근 상자 안의 흰 글자가 한 줄씩 한꺼번에 나타난다. 색·단어별 효과 없음. 설명·강의·튜토리얼에 쓴다(`mix`에는 섞이지 않음). 글씨는 `--scale 0.85` 안팎이 편하다.
+
 ## 선택 장식 (기본 꺼짐)
 
 - 이모지와 밑줄(라인)은 **기본 꺼짐**이다. 사용자가 요청할 때만 `--deco emoji,line`을 준다. 이모지는 기본 목록(한국어·영어 약 45개)에 있는 단어에서만 나온다. 한 글자 키는 단어 맨 앞에서만 맞춘다. 의미가 안 맞는 이모지는 `--emoji-map`으로 덮어쓰고 시안에서 확인한다.
 
-## 스타일 고르는 기준 (19개 + mix)
+## 스타일 고르는 기준 (19개 + plain + mix)
 
 | id | 이름 | 어울리는 곳 | 주의 |
 |---|---|---|---|

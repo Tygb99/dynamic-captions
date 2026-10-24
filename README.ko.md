@@ -1,6 +1,6 @@
 <p align="right"><a href="README.md">English</a> | <b>한국어</b></p>
 
-<p align="center"><img src="docs/styles.png" alt="dynamic-captions: 같은 장면에 자막 스타일 19가지를 입힌 비교 시안" width="560"></p>
+<p align="center"><img src="docs/styles.png" alt="dynamic-captions: 같은 장면에 자막 스타일 10개 이상을 입힌 비교 시안" width="560"></p>
 
 <p align="center">
 <a href="https://github.com/reedodev/dynamic-captions/actions/workflows/test.yml"><img src="https://github.com/reedodev/dynamic-captions/actions/workflows/test.yml/badge.svg" alt="test"></a>
@@ -12,7 +12,7 @@
 
 **영상을 주면, 말한 내용을 화면에 자막으로 써 줍니다. 모양은 직접 고릅니다.**
 
-영상 편집을 배우거나 시간표를 만질 필요가 없습니다. 도구가 영상을 듣고 말한 단어를 시간과 함께 적은 다음, 같은 장면을 자막 스타일 19가지로 보여 줍니다. 마음에 드는 것을 고르면 자막이 박힌 새 영상을 만들어 줍니다.
+영상 편집을 배우거나 시간표를 만질 필요가 없습니다. 도구가 영상을 듣고 말한 단어를 시간과 함께 적은 다음, 같은 장면을 10개 이상의 자막 스타일로 보여 줍니다. 마음에 드는 것을 고르면 자막이 박힌 새 영상을 만들어 줍니다.
 
 Claude Code(Anthropic의 AI 비서로, 내 컴퓨터에서 일합니다)에 붙여 쓰는 "스킬"입니다. 비서와 대화로 쓸 수도 있고, 명령을 직접 입력해도 됩니다. 두 방법을 모두 아래에 적었습니다.
 
@@ -25,7 +25,7 @@ Claude Code(Anthropic의 AI 비서로, 내 컴퓨터에서 일합니다)에 붙�
 
 ## 무엇이 다른가요?
 
-- **스타일 19가지와 "자동 섞기".** 자동 섞기는 문장마다 모양을 바꿔서 영상이 단조롭지 않게 합니다.
+- **10개 이상의 스타일과 "자동 섞기".** 자동 섞기는 문장마다 모양을 바꿔서 영상이 단조롭지 않게 합니다.
 - **자막이 왼쪽·오른쪽·위·아래로 돌아가며 나옵니다.** 다만 앱이 버튼이나 자체 자막을 띄우는 자리는 피합니다.
 - **얼굴을 피합니다.** 얼굴을 찾아서 자막을 다른 자리에 둡니다.
 - **글씨가 너무 작아지지 않습니다.** 너무 작아질 것 같으면 더 넓은 자리로 옮깁니다.
@@ -111,7 +111,7 @@ node $S/make-captions.mjs --video my.mp4 --words words.json --out job --scale 1.
 node $S/render.mjs preview job
 ```
 
-`job/preview/overview.png`를 여세요. 내 장면이 19가지 스타일과 "자동 섞기"로 나옵니다. 마음에 드는 것의 이름(예: `block-sweep`, `mix`)을 적어 두세요.
+`job/preview/overview.png`를 여세요. 내 장면이 모든 스타일과 "자동 섞기"로 나옵니다. 마음에 드는 것의 이름(예: `block-sweep`, `mix`)을 적어 두세요.
 
 **4단계: 짧게 맛보기, 그다음 전체**
 
@@ -122,7 +122,7 @@ node $S/render.mjs final job --style mix                   # 영상 전체
 
 완성된 영상은 `job/out/`에 `captioned-mix.mp4`로 생깁니다. 편집 프로그램에 올릴 투명 자막 파일도 필요하면 `--alpha`, 그래픽카드를 쓰려면 `--encoder auto`, 컴퓨터가 느려지면 `--workers 1`을 붙이세요.
 
-## 스타일 19가지, 쉬운 말로
+## 스타일, 쉬운 말로
 
 | 이름 | 어떻게 보이나요 |
 |---|---|
@@ -192,7 +192,7 @@ node $S/render.mjs final job --style mix                   # 영상 전체
 
 ## 시험
 
-`node tests/run.mjs`가 스킬 파일을 검사하고, 가짜 영상으로 자막 만들기·스타일 19종 시안·최종 렌더·병렬 렌더·철자 맞추기·듣기 클립·얼굴 찾기·박자 검출을 실제로 돌립니다. 변경할 때마다 GitHub Actions가 같은 시험을 돌립니다(맨 위 배지). Whisper 자체는 시험에 넣지 않았습니다.
+`node tests/run.mjs`가 스킬 파일을 검사하고, 가짜 영상으로 자막 만들기·스타일 시안·최종 렌더·병렬 렌더·철자 맞추기·듣기 클립·얼굴 찾기·박자 검출을 실제로 돌립니다. 변경할 때마다 GitHub Actions가 같은 시험을 돌립니다(맨 위 배지). Whisper 자체는 시험에 넣지 않았습니다.
 
 개발자용 자료: [SKILL.md](skills/dynamic-captions/SKILL.md)(비서가 따르는 지침, 한국어), [styles.md](skills/dynamic-captions/references/styles.md)(동작 방식과 측정 수치).
 

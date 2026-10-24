@@ -1,6 +1,6 @@
 <p align="right"><b>English</b> | <a href="README.ko.md">한국어</a></p>
 
-<p align="center"><img src="docs/styles.png" alt="dynamic-captions: the same scene captioned in 19 styles, side by side" width="560"></p>
+<p align="center"><img src="docs/styles.png" alt="dynamic-captions: the same scene captioned in 10+ styles, side by side" width="560"></p>
 
 <p align="center">
 <a href="https://github.com/reedodev/dynamic-captions/actions/workflows/test.yml"><img src="https://github.com/reedodev/dynamic-captions/actions/workflows/test.yml/badge.svg" alt="test"></a>
@@ -12,7 +12,7 @@
 
 **You give it a video. It writes the words on the screen, in a style you choose.**
 
-That is the whole idea. You do not draw anything or edit a timeline. The tool listens to your video, writes down every spoken word with its time, and shows you the same scene in 19 caption styles. You pick the one you like, and it gives you a new video with the captions burned in.
+That is the whole idea. You do not draw anything or edit a timeline. The tool listens to your video, writes down every spoken word with its time, and shows you the same scene in 10+ caption styles. You pick the one you like, and it gives you a new video with the captions burned in.
 
 It is a "skill" for Claude Code (an AI assistant from Anthropic that runs on your computer). You can use it by chatting with the assistant, or run the commands yourself. Both ways are explained below.
 
@@ -25,7 +25,7 @@ Yes, if you:
 
 ## What makes it different
 
-- **19 looks + "mix".** Mix changes the look sentence by sentence, so the video does not feel repetitive.
+- **10+ looks + "mix".** Mix changes the look sentence by sentence, so the video does not feel repetitive.
 - **Captions move around** (left, right, top, bottom), but never into the zones where apps put their own buttons or subtitles.
 - **Faces are avoided.** It finds faces and puts captions somewhere else.
 - **Text is never tiny.** If a caption would get too small, it moves to a wider spot.
@@ -111,7 +111,7 @@ node $S/make-captions.mjs --video my.mp4 --words words.json --out job --scale 1.
 node $S/render.mjs preview job
 ```
 
-Open `job/preview/overview.png`. It shows your scene captioned in all 19 styles plus "mix". Choose one and note its name (for example `block-sweep` or `mix`).
+Open `job/preview/overview.png`. It shows your scene captioned in every style plus "mix". Choose one and note its name (for example `block-sweep` or `mix`).
 
 **Step 4: make a short sample, then the full video**
 
@@ -122,7 +122,7 @@ node $S/render.mjs final job --style mix                   # the whole video
 
 Your video is in `job/out/` (named `captioned-mix.mp4`). Add `--alpha` if you also want a transparent caption file for your editing program. Add `--encoder auto` to use your graphics card, `--workers 1` if your computer gets slow.
 
-## The 19 styles in plain words
+## The styles in plain words
 
 | Name | What you see |
 |---|---|
@@ -192,7 +192,7 @@ You do not have to remember options. Tell the assistant what you want:
 
 ## Tests
 
-`node tests/run.mjs` checks the skill file and runs everything on a made-up video: captions, the 19-style sheet, a final render, parallel render, spelling alignment, the listening clips, face finding and beat detection. GitHub Actions runs it on every change (see the badge on top). Whisper itself is not part of the test.
+`node tests/run.mjs` checks the skill file and runs everything on a made-up video: captions, the style sheet, a final render, parallel render, spelling alignment, the listening clips, face finding and beat detection. GitHub Actions runs it on every change (see the badge on top). Whisper itself is not part of the test.
 
 Details for developers: [SKILL.md](skills/dynamic-captions/SKILL.md) (the instructions the assistant follows, written in Korean) and [styles.md](skills/dynamic-captions/references/styles.md) (how it works, measured numbers).
 

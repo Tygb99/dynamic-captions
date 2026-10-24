@@ -84,7 +84,16 @@ cp -r dynamic-captions/skills/dynamic-captions ~/.claude/skills/
 
 비서가 받아쓰기를 하고, 모든 모양이 한 장에 담긴 **스타일 시안**을 보여 준 뒤 선택을 기다립니다. *"7번으로 해 줘"*, *"핵심 단어가 노랗게 나오는 걸로"*처럼 말하면 됩니다. 그러면 영상을 만들고 파일 위치를 알려 줍니다.
 
-### 방법 2: 명령을 직접 입력하기
+### 방법 2: 명령 한 줄 (그다음 스타일 고르기)
+
+듣기, 작업 폴더, 스타일 시안까지 알아서 해 줍니다.
+
+```bash
+node skills/dynamic-captions/scripts/start.mjs my.mp4 --lang ko --out job
+```n
+job/preview/overview.png 가 만들어지면 멈춥니다. 그림을 열어 스타일을 고른 뒤, 마지막에 나온 명령(ender.mjs final ...)을 실행하세요. 붙일 수 있는 옵션: `--script 가사.txt`(가사로 철자 고치기), `--faces`(얼굴 피하기), `--beat`(박자에 맞춰 살짝 움직이기), `--model small`(빠르게).
+
+### 방법 3: 모든 단계를 직접 입력하기
 
 `my.mp4`를 내 영상 이름으로 바꾸세요. 이 프로젝트를 내려받은 폴더에서 실행합니다. 아래 첫 줄은 맥/리눅스용이고, 윈도우 PowerShell에서는 `$S = "skills/dynamic-captions/scripts"`로 쓰고 나머지 줄은 그대로 둡니다.
 

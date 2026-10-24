@@ -528,7 +528,7 @@
   window.styles = { ...Object.fromEntries(Object.entries(S).map(([k, v]) => [k, v.label])), mix: '자동 섞기' };
   window.DURATION = D.duration;
   // mounts every phrase once and reports the smallest text size and the spot actually used (for QA)
-  window.sizeScan = async () => { const out = []; for (const ph of phrases) { await window.seek((ph.vs + ph.ve) / 2); out.push({ k: ph.k, start: +ph.start.toFixed(2), text: ph.words.map((w) => w.text).join(' '), pos: ph.pos, assigned: ph.pos0, widened: !!ph.widened, minPx: +ph.minPx.toFixed(1), ok: ph.minPx >= MINPX, faceHit: +(ph.faceHit || 0).toFixed(3) }); } return { minAllowed: +MINPX.toFixed(1), phrases: out }; };
+  window.sizeScan = async () => { const out = []; for (const ph of phrases) { await window.seek((ph.vs + ph.ve) / 2); out.push({ k: ph.k, start: +ph.start.toFixed(2), text: ph.words.map((w) => w.text).join(' '), pos: ph.pos, assigned: ph.pos0, widened: !!ph.widened, minPx: +(ph.minPx === undefined ? 99 : ph.minPx).toFixed(1), ok: (ph.minPx === undefined ? 99 : ph.minPx) >= MINPX, faceHit: +(ph.faceHit || 0).toFixed(3) }); } return { minAllowed: +MINPX.toFixed(1), phrases: out }; };
   // QA data for the renderer: reading speed per phrase, and characters a font cannot draw (silently replaced by a fallback font)
   window.phraseStats = () => phrases.map((ph) => { const chars = ph.words.reduce((n, w) => n + [...strip(w.text)].length, 0); const vis = ph.ve - ph.vs; return { k: ph.k, start: +ph.start.toFixed(2), chars, visible: +vis.toFixed(2), cps: +(chars / vis).toFixed(1), text: ph.words.map((w) => w.text).join(' ') }; });
   window.fontCoverage = () => {

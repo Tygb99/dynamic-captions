@@ -84,7 +84,16 @@ Put your video in a folder and tell the assistant, for example:
 
 The assistant will transcribe, show you a **style sheet** (one picture with all the looks), and wait for you to choose. Say something like *"number 7"* or *"the yellow one that highlights the key word"*. Then it renders the video and tells you where the file is.
 
-### Way 2: type the commands yourself
+### Way 2: one command (then pick a style)
+
+This does the listening, the folder and the style sheet for you:
+
+```bash
+node skills/dynamic-captions/scripts/start.mjs my.mp4 --lang en --out job
+```n
+It stops when job/preview/overview.png is ready. Open it, choose a style, then run the last command it prints (ender.mjs final ...). Options you can add: `--script lyrics.txt` (fix the spelling from your lyrics), `--faces` (keep captions off faces), `--beat` (pulse on the beat), `--model small` (faster).
+
+### Way 3: type every step yourself
 
 Replace `my.mp4` with your video. Run the commands from the folder where you cloned this project. The first line below is for Mac/Linux; in Windows PowerShell write it as `$S = "skills/dynamic-captions/scripts"` and leave the other lines as they are.
 

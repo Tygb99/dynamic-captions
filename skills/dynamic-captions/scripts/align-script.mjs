@@ -65,7 +65,9 @@ const maxWord = +(opt['max-word'] || 1.8); let capped = 0;
 for (const w of out) { const cap = Math.max(maxWord * 0.35, Math.min(maxWord, 0.3 + [...w.text].length * 0.22)); if (w.end - w.start > cap) { w.end = +(w.start + cap).toFixed(3); capped++; } }
 if (capped) console.log(`  capped ${capped} over-long word end time(s) (max ${maxWord}s per word; --max-word to change)`);
 const matched = exact.filter(Boolean).length / n;
+const squeezed = out.filter((w) => w.end - w.start < 0.13).length; if (squeezed / out.length > 0.15 && !opt.force) { console.error('FAIL: ' + squeezed + ' of ' + out.length + ' script words have no time of their own (squeezed together). The script is probably longer than the audio, or covers a different part. Cut the script to match this audio, or use --force.'); process.exit(2); }
+if (matched < 0.6 && !opt.force) { console.error('FAIL: script and audio differ too much (match under 60%). Wrong script or wrong section? Nothing was written (use --force to write anyway).'); process.exit(2); }
 fs.writeFileSync(opt.out || 'words.aligned.json', JSON.stringify({ language: src.language, precision: src.precision || 'word-level', aligned: true, scriptMatch: +matched.toFixed(3), mismatches: mism, words: out }, null, 1));
 console.log(`script words ${out.length} | exact character match ${(matched * 100).toFixed(1)}% | words needing a check ${mism.length}`);
 for (const x of mism.slice(0, 20)) console.log(`  MISMATCH ${x.at}s script "${x.script}" / heard "${x.heard}" (${x.wrongChars} chars)`);
-if (matched < 0.6) { console.error('FAIL: script and audio differ too much (match under 60%). Wrong script or wrong section?'); process.exit(2); }
+

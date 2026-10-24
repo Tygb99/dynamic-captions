@@ -22,7 +22,7 @@ const { width: W, height: H, fps, duration } = job; const isPortrait = H > W;
 const ff = (args, cwd) => { const r = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-y', ...args], { stdio: 'inherit', cwd }); if (r.status) throw new Error('ffmpeg failed: ' + args.join(' ').slice(0, 300)); };
 
 // video encoder: --encoder libx264 (default) | h264_nvenc | auto (nvenc if a 1-frame test encode works, else libx264)
-let usedEnc = 'libx264'; let usedWorkers = 1;
+let usedEnc = 'libx264'; let usedWorkers = 1; const tempDirs = []; // frame folders: removed on every exit path unless --keep
 function venc() {
   let enc = String(opt.encoder || 'libx264');
   if (enc === 'auto') { const t = spawnSync('ffmpeg', ['-hide_banner', '-loglevel', 'error', '-f', 'lavfi', '-i', 'color=c=black:s=256x256:d=0.1', '-c:v', 'h264_nvenc', '-f', 'null', '-'], { stdio: 'ignore' }); enc = t.status === 0 ? 'h264_nvenc' : 'libx264'; }
@@ -43,7 +43,7 @@ function findChrome() {
   throw new Error('Chrome/Chromium not found: set CHROME=<path>');
 }
 const port = 9300 + Math.floor(Math.random() * 600);
-const prof = fs.mkdtempSync(path.join(process.env.TEMP || '.', 'dyncap-chrome-'));
+const prof = fs.mkdtempSync(path.join(os.tmpdir(), 'dyncap-chrome-'));
 const chrome = spawn(findChrome(), [`--remote-debugging-port=${port}`, `--user-data-dir=${prof}`, '--headless=new', ...(process.platform === 'linux' ? ['--no-sandbox', '--disable-gpu'] : []), '--hide-scrollbars', '--mute-audio', `--window-size=${W},${H}`, '--force-device-scale-factor=1', '--font-render-hinting=none', '--force-color-profile=srgb', '--no-first-run', 'about:blank'], { stdio: 'ignore' });
 let list; for (let i = 0; i < 100; i++) { try { list = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json(); if (list.some((x) => x.type === 'page')) break; } catch {} await new Promise((r) => setTimeout(r, 100)); }
 const ws = new WebSocket(list.find((x) => x.type === 'page').webSocketDebuggerUrl); await new Promise((r, j) => { ws.onopen = r; ws.onerror = j; });
@@ -96,7 +96,16 @@ async function qaReport() {
   return { fast: fast.map((s) => ({ start: s.start, cps: s.cps, text: s.text })), missingGlyphs: Object.fromEntries(miss), size: { minAllowed: sz.minAllowed, small: small.map((p) => ({ start: p.start, minPx: p.minPx, pos: p.pos, text: p.text })), moved: moved.length }, faceOverlap: onFace.map((p) => ({ start: p.start, hit: p.faceHit, pos: p.pos, text: p.text })) };
 }
 const wordsData = JSON.parse(fs.readFileSync(path.join(JOB, 'data.js'), 'utf8').replace(/^window\.CAPDATA=/, '').replace(/;$/, '')).words;
-const cleanup = () => { if (errors.length) console.log('페이지 오류:', errors.slice(0, 3).join(' | ')); try { ws.close(); chrome.kill(); srv.close(); setTimeout(() => fs.rmSync(prof, { recursive: true, force: true }), 800); } catch {} };
+const chromeExit = new Promise((res) => chrome.once('exit', res));
+// stop Chrome (whole process tree), wait until it is really gone, then delete its profile and any leftover frame folder (unless --keep)
+const cleanup = async () => {
+  if (errors.length) console.log('페이지 오류:', errors.slice(0, 3).join(' | '));
+  try { ws.close(); srv.close(); } catch {}
+  try { if (process.platform === 'win32') spawnSync('taskkill', ['/pid', String(chrome.pid), '/t', '/f'], { stdio: 'ignore' }); else chrome.kill('SIGKILL'); } catch {}
+  await Promise.race([chromeExit, new Promise((r) => setTimeout(r, 5000))]); await new Promise((r) => setTimeout(r, 600));
+  const rm = (p) => { try { fs.rmSync(p, { recursive: true, force: true, maxRetries: 25, retryDelay: 200 }); } catch (e) { if (process.env.DYNCAP_DEBUG) console.error('rm failed', p, e.code); } };
+  rm(prof); if (!opt.keep) tempDirs.forEach(rm);
+};
 
 try {
   if (mode === 'preview') {
@@ -140,7 +149,7 @@ try {
     const [ra, rb] = opt.range ? String(opt.range).split(',').map(Number) : [0, duration];
     const n0 = Math.round(ra * fps), n1 = Math.round(Math.min(rb, duration) * fps), N = n1 - n0;
     const tmpBase = opt.tmp || process.env.DYNCAP_TMP || LOCAL.tmp || path.join(os.tmpdir(), 'dynamic-captions'); fs.mkdirSync(tmpBase, { recursive: true });
-    const work = path.join(tmpBase, 'dyncap-' + path.basename(JOB) + '-' + style + '-' + Date.now()); fs.mkdirSync(work, { recursive: true });
+    const work = path.join(tmpBase, 'dyncap-' + path.basename(JOB) + '-' + style + '-' + Date.now()); fs.mkdirSync(work, { recursive: true }); tempDirs.push(work);
     const blank = path.join(work, 'blank.png'); await png(-5, blank);
     const times = []; for (let n = 0; n < N; n++) times.push((n0 + n) / fps);
     const vis = []; for (const t of times) vis.push(await ev(`window.visible(${t})`));
@@ -179,7 +188,7 @@ try {
     fs.writeFileSync(out.replace(/\.mp4$/, '.json'), JSON.stringify({ made: new Date().toISOString(), video: job.video, videoStat: job.videoStat, style, range: [ra, rb], encoder: usedEnc, workers: usedWorkers, frames: N, fps, timingPrecision: job.precision || 'unknown', approxWords: job.approxWords, zoneWarnings: bad.length, qa: report, mixPlan: style === 'mix' ? await ev('window.mixPlan') : undefined, posPlan: await ev('window.posPlan') }, null, 1));
     console.log('video:', out); if (alpha) console.log('alpha:', alpha); console.log('sheet:', path.join(outDir, name.replace(/\.mp4$/, '') + '-sheet.png'));
   } else throw new Error('unknown mode ' + mode);
-} finally { cleanup(); }
+} finally { await cleanup(); }
 
 
 

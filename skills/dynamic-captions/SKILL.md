@@ -39,6 +39,8 @@ JIZURA(노래 가사 타이포)와 GitHub 오픈소스 자막 스킬들의 아�
 
 ## 흐름 (영상 하나당 이 순서)
 
+**빠른 시작(한 줄)**: `node scripts/start.mjs <영상> --lang ko [--script 가사.txt] [--faces] [--beat --bpm-hint 88] --out job` 가 아래 2~5단계(받아쓰기, 철자 맞추기+청취 클립, 얼굴, 박자, 작업 폴더, 시안)를 한 번에 하고 `overview.png` 에서 멈춘다. 그 뒤 스타일을 골라 `render.mjs final` 만 실행하면 된다. 단계별로 직접 하고 싶을 때만 아래를 따른다.
+
 1. **입력 확인**: 영상 파일, 말인지 노래인지, 가로(16:9)인지 세로(9:16)인지, 영상에 이미 박힌 자막이 있는지 본다. 이미 박힌 자막이 있으면 새 자막과 겹치므로 사용자에게 알리고 자막 없는 원본을 받는다.
 2. **단어 시간표 만들기** (`words.json`)
    - 말소리와 노래 모두 먼저: `python scripts/transcribe.py <영상 또는 음원> --out words.json --lang ko` (Whisper large-v3-turbo, 단어 단위). 빨간 글씨로 나오는 Triton 경고(`Failed to compile`, `Python.h not found`, `falling back to a slower ... implementation`)는 모두 같은 종류이며 결과에 영향이 없으니 무시한다(종료 코드가 0이면 정상). 끝 침묵에서 Whisper가 지어낸 말은 자동으로 버리고, 음표·깨진 글자가 20%를 넘으면 종료 코드 3으로 막는다. 결과에는 `precision`(word-level 또는 cue-level)이 기록된다. 대본·가사가 있으면 `--prompt-file script.txt`로 철자 힌트를 줄 수 있다(시험에서 효과는 작아서 12곳이 11곳으로 줄었다).

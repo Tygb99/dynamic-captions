@@ -180,8 +180,11 @@ try {
     ff(['-ss', String(ra), '-t', String(N / fps), '-i', job.video, '-framerate', String(fps), '-start_number', '0', '-i', path.join(work, 'f_%06d.png'), '-filter_complex', '[0:v][1:v]overlay=shortest=1:format=auto,format=yuv420p[v]', '-map', '[v]', '-map', '0:a?', ...venc(), '-c:a', 'aac', '-b:a', '256k', '-movflags', '+faststart', out]);
     let alpha = null;
     if (opt.alpha) { alpha = path.join(outDir, name.replace(/\.mp4$/, '') + '-alpha.mov'); ff(['-framerate', String(fps), '-start_number', '0', '-i', path.join(work, 'f_%06d.png'), '-c:v', 'prores_ks', '-profile:v', '4444', '-pix_fmt', 'yuva444p10le', alpha]); }
-    const pr = spawnSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-count_frames', '-show_entries', 'stream=nb_read_frames,width,height', '-of', 'csv=p=0', out], { encoding: 'utf8' }).stdout.trim();
-    const got = +pr.split(',').pop(); const diff = Math.abs(got - N);
+    // key=value output: the csv field order and a trailing comma differ between files, so reading the last csv field gave a false 'frames differ' warning
+    const prRaw = spawnSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0', '-count_frames', '-show_entries', 'stream=nb_read_frames,width,height', '-of', 'default=nw=1', out], { encoding: 'utf8' }).stdout;
+    const kv = Object.fromEntries(prRaw.split(/\r?\n/).filter(Boolean).map((l) => l.split('=')));
+    const pr = `${kv.width},${kv.height},${kv.nb_read_frames}`;
+    const got = +kv.nb_read_frames; const diff = Math.abs(got - N);
     console.log(`check: ${pr} (expected about ${N} frames, difference ${diff})` + (diff > 2 ? '  ⚠ 프레임 수가 다릅니다. 원본의 영상 줄기 길이·가변 프레임율을 ffprobe로 확인하세요' : ''));
     ff(['-i', out, '-vf', `fps=1/${Math.max(1, Math.round(N / fps / 20))},scale=${H > W ? 216 : 384}:-2,tile=${H > W ? 10 : 5}x2`, '-frames:v', '1', path.join(outDir, name.replace(/\.mp4$/, '') + '-sheet.png')]);
     if (!opt.keep) fs.rmSync(work, { recursive: true, force: true });

@@ -81,6 +81,7 @@ const hasPy = (mod) => run(PY, ['-c', `import ${mod}`]).status === 0;
 if (hasPy('cv2')) {
   r = run(PY, [path.join(S, 'find-faces.py'), vid, '--out', path.join(work, 'faces.json')]);
   ok(r.status === 0 && fs.existsSync(path.join(work, 'faces.json')), 'find-faces runs');
+  if (r.status !== 0) console.log('  find-faces stderr: ' + (r.stderr || '').split('\n').slice(-8).join(' | ') + ' stdout: ' + (r.stdout || '').slice(-300));
 } else console.log('skip find-faces (opencv not installed)');
 if (hasPy('librosa')) {
   const click = path.join(work, 'click.wav');
